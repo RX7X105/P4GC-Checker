@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GCchecker</title>
+
+<style>
+*{box-sizing:border-box;}
+
+html,body{
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:#111;
+    color:#fff;
+    font-family:sans-serif;
+    padding:6px;
+}
+
+#viewBtn{
+    position:fixed;
+    top:6px;
+    right:6px;
+    z-index:999;
+    height:42px;
+    padding:0 12px;
+    border:none;
+    border-radius:8px;
+    background:#444;
+    color:#fff;
+    font-weight:bold;
+    font-size:14px;
+}
+
+.gc{
+    font-size:clamp(17px,2.3vh,27px);
+    font-weight:bold;
+    margin:8px 0 4px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:4px;
+}
+
+.btn{
+    border:none;
+    border-radius:8px;
+    min-height:clamp(48px,7.2vh,85px);
+    font-size:clamp(15px,2.1vh,25px);
+    font-weight:bold;
+    background:#333;
+    color:#fff;
+    padding:6px;
+}
+
+.btn.active{
+    background:#1e8e3e;
+}
+
+.result{
+    margin-top:6px;
+    background:#000;
+    border:1px solid #666;
+    border-radius:8px;
+    padding:10px;
+    line-height:1.45;
+    font-size:clamp(19px,2.85vh,42px);
+    font-weight:bold;
+}
+
+.stop{
+    color:#ffd600;
+    font-weight:900;
+}
+
+.move{
+    color:#4fc3ff;
+    font-weight:900;
+}
+
+.reset{
+    width:100%;
+    margin-top:6px;
+    border:none;
+    border-radius:8px;
+    height:clamp(46px,6.2vh,76px);
+    font-size:clamp(17px,2.4vh,27px);
+    font-weight:bold;
+    background:#b00020;
+    color:white;
+}
+</style>
+</head>
+
+<body>
+
+<button id="viewBtn" onclick="toggleView()">表示：頭割り/散開</button>
+
+<div class="gc">GC1</div>
+<div class="grid">
+<button class="btn" data-id="t1"></button>
+<button class="btn" data-id="f1"></button>
+</div>
+
+<div class="gc">GC2</div>
+<div class="grid">
+<button class="btn" data-id="f2"></button>
+</div>
+
+<div class="gc">ほのお・つなみ</div>
+<div class="grid">
+<button class="btn" data-id="c5" data-label="ほのお"></button>
+<button class="btn" data-id="c6" data-label="つなみ"></button>
+</div>
+
+<div class="gc">サンダガ</div>
+<div class="grid">
+<button class="btn" data-id="c8" data-label="チャージ"></button>
+<button class="btn" data-id="d8" data-label="アウト"></button>
+</div>
+
+<div class="gc">ブリザガ</div>
+<div class="grid">
+<button class="btn" data-id="c9" data-label="チャージ"></button>
+<button class="btn" data-id="d9" data-label="アウト"></button>
+</div>
+
+<div id="result" class="result"></div>
+
+<button class="reset" onclick="resetAll()">リセット</button>
+
+<script>
+
+const s = {
+    firstThunderEarly:true,
+    f1:true,
+    f2:true,
+    c5:true,
+    c6:true,
+    c8:true,
+    d8:true,
+    c9:true,
+    d9:true
+};
+
+let simpleView = true;
+
+function renderUI(){
+
+    document.querySelectorAll(".btn").forEach(btn=>{
+
+        const id = btn.dataset.id;
+
+        let val = false;
+
+        if(id==="t1"){
+            val = s.firstThunderEarly;
+        }else{
+            val = s[id];
+        }
+
+        btn.classList.toggle("active", !!val);
+
+        if(id==="t1"){
+            btn.textContent =
+                "水雷（" + (s.firstThunderEarly ? "早" : "遅") + "）";
+        }
+        else if(id==="f1"){
+            btn.textContent = s.f1 ? "真" : "偽";
+        }
+        else if(id==="f2"){
+            btn.textContent = s.f2 ? "真" : "偽";
+        }
+        else{
+            btn.textContent =
+                btn.dataset.label +
+                (val ? "（真）" : "（偽）");
+        }
+    });
+}
+
+function make(j){
+
+    if(simpleView){
+        return j
+            ? "水：頭割り　雷：散開"
+            : "水：散開　雷：頭割り";
+    }
+
+    return j
+        ? "水AC / 雷BD"
+        : "水BD / 雷AC";
+}
+
+function calc(){
+
+    const f1 = s.f1;
+    const f2 = s.f2;
+
+    let r1,r4;
+
+    if(s.firstThunderEarly){
+        r1 = make(f1);
+        r4 = make(f2);
+    }else{
+        r1 = make(f2);
+        r4 = make(f1);
+    }
+
+    const v1 = f1 ? "外向く" : "中向く";
+    const v4 = f2 ? "外向く" : "中向く";
+
+    const k5 = s.c5 ? "中央から外" : "中央待機";
+    const k6 = s.c6 ? "中央待機" : "中央から外";
+
+    const j8 = (s.c8 === s.d8)
+        ? "踏まない"
+        : "直線踏む";
+
+    const j9 = (s.c9 === s.d9)
+        ? "踏まない"
+        : "扇踏む";
+
+    let l1;
+
+    if(j8==="踏まない" && j9==="踏まない"){
+        l1="踏まない";
+    }
+    else if(j8!=="踏まない" && j9!=="踏まない"){
+        l1="踏む踏む";
+    }
+    else{
+        l1=(j8==="踏まない") ? j9 : j8;
+    }
+
+    const stopHtml = '<span class="stop">止まる</span>';
+    const moveHtml = '<span class="move">動く</span>';
+
+    const earlySightMove = f1 ? stopHtml : moveHtml; // 早視線 → GC1真偽
+    const gc2NoJobMove  = f2 ? stopHtml : moveHtml; // GC2無職 → GC2真偽
+
+    const lateSightMove = f2 ? stopHtml : moveHtml; // 遅視線 → GC2真偽
+    const gc1NoJobMove  = f1 ? stopHtml : moveHtml; // GC1無職 → GC1真偽
+
+    document.getElementById("result").innerHTML =
+`① ${r1}
+<br>　早視線:${earlySightMove}　GC2無職:${gc2NoJobMove}
+<br>② ${v1}
+<br>③ ${k5}
+<br>④ ${r4}
+<br>　遅視線:${lateSightMove}　GC1無職:${gc1NoJobMove}
+<br>⑤ ${v4}
+<br>⑥ ${k6}
+<br>⑦ ${l1}`;
+}
+
+function toggleView(){
+
+    simpleView = !simpleView;
+
+    document.getElementById("viewBtn").textContent =
+        simpleView
+        ? "表示：頭割り/散開"
+        : "表示：AC/BD";
+
+    calc();
+}
+
+document.querySelectorAll(".btn").forEach(btn=>{
+
+    btn.addEventListener("pointerdown",(e)=>{
+
+        e.preventDefault();
+
+        const id = btn.dataset.id;
+
+        if(id==="t1"){
+            s.firstThunderEarly = !s.firstThunderEarly;
+        }
+        else{
+            s[id] = !s[id];
+        }
+
+        renderUI();
+        calc();
+    });
+
+});
+
+function resetAll(){
+
+    Object.keys(s).forEach(k=>{
+        if(typeof s[k] === "boolean"){
+            s[k] = true;
+        }
+    });
+
+    s.firstThunderEarly = true;
+
+    renderUI();
+    calc();
+}
+
+renderUI();
+calc();
+
+</script>
+
+</body>
+</html>
