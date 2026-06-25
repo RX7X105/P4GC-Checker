@@ -8,60 +8,93 @@
 <style>
 *{box-sizing:border-box;}
 
-html,body{
-    margin:0;
-    padding:0;
-}
-
 body{
+    margin:0;
+    padding:6px;
     background:#111;
     color:#fff;
     font-family:sans-serif;
-    padding:6px;
 }
 
-#viewBtn{
-    position:fixed;
-    top:6px;
-    right:6px;
-    z-index:999;
-    height:42px;
-    padding:0 12px;
+/* =========================
+   共通フォント基準
+========================= */
+:root{
+    --base-font: clamp(16px, 2.1vh, 24px);
+}
+
+/* =========================
+   行レイアウト
+========================= */
+.gcRow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:6px 0;
+}
+
+/* ラベル列（固定幅） */
+.label{
+    width:7em;
+    font-size:var(--base-font);
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+/* ボタン列 */
+.gcBtns{
+    display:flex;
+    gap:6px;
+}
+
+/* =========================
+   ボタン（完全統一）
+========================= */
+.gcBtns .btn{
+    font-size:var(--base-font);
+    line-height:1;
+
+    height:1.8em;
+
+    padding:0 9px;
+
     border:none;
-    border-radius:8px;
+    border-radius:6px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    white-space:nowrap;
+
+    flex:0 0 auto;
+
+    width:7.4em;
+    text-align:center;
     background:#444;
     color:#fff;
-    font-weight:bold;
-    font-size:14px;
-}
-
-.gc{
-    font-size:clamp(17px,2.3vh,27px);
-    font-weight:bold;
-    margin:8px 0 4px;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:4px;
-}
-
-.btn{
-    border:none;
-    border-radius:8px;
-    min-height:clamp(48px,7.2vh,85px);
-    font-size:clamp(15px,2.1vh,25px);
-    font-weight:bold;
-    background:#333;
-    color:#fff;
-    padding:6px;
 }
 
 .btn.active{
     background:#1e8e3e;
 }
 
+/* =========================
+   メインボタン（既存維持）
+========================= */
+.btn{
+    border:none;
+    border-radius:8px;
+        font-size:var(--base-font);
+    font-weight:bold;
+    background:#333;
+    color:#fff;
+    
+}
+
+/* =========================
+   結果
+========================= */
 .result{
     margin-top:6px;
     background:#000;
@@ -73,66 +106,105 @@ body{
     font-weight:bold;
 }
 
-.stop{
-    color:#ffd600;
-    font-weight:900;
+.stop{ color:#ffd600; font-weight:900; }
+.move{ color:#4fc3ff; font-weight:900; }
+
+/* =========================
+   下部ボタン
+========================= */
+.btnRow{
+    display:flex;
+    gap:6px;
+    margin-top:6px;
 }
 
-.move{
-    color:#4fc3ff;
-    font-weight:900;
+.reset,
+#viewBtn{
+    flex:1;
+    height:clamp(46px,6.2vh,76px);
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
 }
 
 .reset{
-    width:100%;
-    margin-top:6px;
-    border:none;
-    border-radius:8px;
-    height:clamp(46px,6.2vh,76px);
-    font-size:clamp(17px,2.4vh,27px);
-    font-weight:bold;
     background:#b00020;
-    color:white;
+    color:#fff;
+    font-size:var(--base-font);
+}
+
+#viewBtn{
+    background:#444;
+    color:#fff;
+    font-size:var(--base-font);
+}
+
+.headshare{
+    color:#4fc3ff; /* 水色 */
+    font-weight:900;
+}
+
+.spread{
+    color:#ffd600; /* 黄色 */
+    font-weight:900;
 }
 </style>
 </head>
 
 <body>
 
-<button id="viewBtn" onclick="toggleView()">表示：頭割り/散開</button>
-
-<div class="gc">GC1</div>
-<div class="grid">
-<button class="btn" data-id="t1"></button>
-<button class="btn" data-id="f1"></button>
+<!-- GC1 -->
+<div class="gcRow">
+    <div class="label">GC1</div>
+    <div class="gcBtns">
+        <button class="btn" data-id="t1"></button>
+        <button class="btn" data-id="f1"></button>
+    </div>
 </div>
 
-<div class="gc">GC2</div>
-<div class="grid">
-<button class="btn" data-id="f2"></button>
+<!-- GC2 -->
+<div class="gcRow">
+    <div class="label">GC2</div>
+    <div class="gcBtns">
+        <button class="btn" data-id="f2"></button>
+    </div>
 </div>
 
-<div class="gc">ほのお・つなみ</div>
-<div class="grid">
-<button class="btn" data-id="c5" data-label="ほのお"></button>
-<button class="btn" data-id="c6" data-label="つなみ"></button>
+<!-- ほのお・つなみ -->
+<div class="gcRow">
+    <div class="label">ほのお・つなみ</div>
+    <div class="gcBtns">
+        <button class="btn" data-id="c5" data-label="ほのお"></button>
+        <button class="btn" data-id="c6" data-label="つなみ"></button>
+    </div>
 </div>
 
-<div class="gc">サンダガ</div>
-<div class="grid">
-<button class="btn" data-id="c8" data-label="チャージ"></button>
-<button class="btn" data-id="d8" data-label="アウト"></button>
+<!-- サンダガ -->
+<div class="gcRow">
+    <div class="label">サンダガ</div>
+    <div class="gcBtns">
+        <button class="btn" data-id="c8" data-label="チャージ"></button>
+        <button class="btn" data-id="d8" data-label="アウト"></button>
+    </div>
 </div>
 
-<div class="gc">ブリザガ</div>
-<div class="grid">
-<button class="btn" data-id="c9" data-label="チャージ"></button>
-<button class="btn" data-id="d9" data-label="アウト"></button>
+<!-- ブリザガ -->
+<div class="gcRow">
+    <div class="label">ブリザガ</div>
+    <div class="gcBtns">
+        <button class="btn" data-id="c9" data-label="チャージ"></button>
+        <button class="btn" data-id="d9" data-label="アウト"></button>
+    </div>
 </div>
 
+<!-- 結果 -->
 <div id="result" class="result"></div>
 
-<button class="reset" onclick="resetAll()">リセット</button>
+<!-- 下部 -->
+<div class="btnRow">
+    <button class="reset" onclick="resetAll()">リセット</button>
+    <button id="viewBtn" onclick="toggleView()">表示：頭割り/散開</button>
+</div>
 
 <script>
 
@@ -156,19 +228,12 @@ function renderUI(){
 
         const id = btn.dataset.id;
 
-        let val = false;
-
-        if(id==="t1"){
-            val = s.firstThunderEarly;
-        }else{
-            val = s[id];
-        }
+        let val = (id==="t1") ? s.firstThunderEarly : s[id];
 
         btn.classList.toggle("active", !!val);
 
         if(id==="t1"){
-            btn.textContent =
-                "水雷（" + (s.firstThunderEarly ? "早" : "遅") + "）";
+            btn.textContent = "水雷（" + (s.firstThunderEarly ? "早" : "遅") + "）";
         }
         else if(id==="f1"){
             btn.textContent = s.f1 ? "真" : "偽";
@@ -177,27 +242,22 @@ function renderUI(){
             btn.textContent = s.f2 ? "真" : "偽";
         }
         else{
-            btn.textContent =
-                btn.dataset.label +
-                (val ? "（真）" : "（偽）");
+            btn.textContent = btn.dataset.label + (val ? "（真）" : "（偽）");
         }
     });
 }
 
 function make(j){
-
     if(simpleView){
         return j
-            ? "水：頭割り　雷：散開"
-            : "水：散開　雷：頭割り";
+            ? '水：<span class="headshare">頭割り</span>　雷：<span class="spread">散開</span>'
+            : '水：<span class="spread">散開</span>　雷：<span class="headshare">頭割り</span>';
     }
 
     return j
-        ? "水AC / 雷BD"
-        : "水BD / 雷AC";
-}
-
-function calc(){
+        ? '水：AC　雷：BD'
+        : '水：BD　雷：AC';
+}function calc(){
 
     const f1 = s.f1;
     const f2 = s.f2;
@@ -215,93 +275,57 @@ function calc(){
     const v1 = f1 ? "外向く" : "中向く";
     const v4 = f2 ? "外向く" : "中向く";
 
-    const k5 = s.c5 ? "中央から外" : "中央待機";
-    const k6 = s.c6 ? "中央待機" : "中央から外";
+    const k5 = s.c5 ? "中央から外へ" : "中央待機";
+    const k6 = s.c6 ? "中央待機" : "中央から外へ";
 
-    const j8 = (s.c8 === s.d8)
-        ? "踏まない"
-        : "直線踏む";
-
-    const j9 = (s.c9 === s.d9)
-        ? "踏まない"
-        : "扇踏む";
+    const j8 = (s.c8 === s.d8) ? "踏まない" : "直線踏む";
+    const j9 = (s.c9 === s.d9) ? "踏まない" : "扇踏む";
 
     let l1;
+    if(j8==="踏まない" && j9==="踏まない") l1="踏まない";
+    else if(j8!=="踏まない" && j9!=="踏まない") l1="踏む踏む";
+    else l1=(j8==="踏まない") ? j9 : j8;
 
-    if(j8==="踏まない" && j9==="踏まない"){
-        l1="踏まない";
-    }
-    else if(j8!=="踏まない" && j9!=="踏まない"){
-        l1="踏む踏む";
-    }
-    else{
-        l1=(j8==="踏まない") ? j9 : j8;
-    }
-
-    const stopHtml = '<span class="stop">止まる</span>';
-    const moveHtml = '<span class="move">動く</span>';
-
-    const earlySightMove = f1 ? stopHtml : moveHtml; // 早視線 → GC1真偽
-    const gc2NoJobMove  = f2 ? stopHtml : moveHtml; // GC2無職 → GC2真偽
-
-    const lateSightMove = f2 ? stopHtml : moveHtml; // 遅視線 → GC2真偽
-    const gc1NoJobMove  = f1 ? stopHtml : moveHtml; // GC1無職 → GC1真偽
+    const stop = '<span class="stop">止まる</span>';
+    const move = '<span class="move">動く</span>';
 
     document.getElementById("result").innerHTML =
 `① ${r1}
-<br>　早視線:${earlySightMove}　GC2無職:${gc2NoJobMove}
+<br>　早視線：${f1 ? stop : move}　GC2無職：${f2 ? stop : move}
 <br>② ${v1}
 <br>③ ${k5}
 <br>④ ${r4}
-<br>　遅視線:${lateSightMove}　GC1無職:${gc1NoJobMove}
+<br>　遅視線：${f2 ? stop : move}　GC1無職：${f1 ? stop : move}
 <br>⑤ ${v4}
 <br>⑥ ${k6}
 <br>⑦ ${l1}`;
 }
 
 function toggleView(){
-
     simpleView = !simpleView;
-
     document.getElementById("viewBtn").textContent =
-        simpleView
-        ? "表示：頭割り/散開"
-        : "表示：AC/BD";
-
+        simpleView ? "表示：頭割り/散開" : "表示：AC/BD";
     calc();
 }
 
 document.querySelectorAll(".btn").forEach(btn=>{
-
     btn.addEventListener("pointerdown",(e)=>{
-
         e.preventDefault();
 
         const id = btn.dataset.id;
-
-        if(id==="t1"){
-            s.firstThunderEarly = !s.firstThunderEarly;
-        }
-        else{
-            s[id] = !s[id];
-        }
+        if(id==="t1") s.firstThunderEarly = !s.firstThunderEarly;
+        else s[id] = !s[id];
 
         renderUI();
         calc();
     });
-
 });
 
 function resetAll(){
-
     Object.keys(s).forEach(k=>{
-        if(typeof s[k] === "boolean"){
-            s[k] = true;
-        }
+        if(typeof s[k]==="boolean") s[k]=true;
     });
-
     s.firstThunderEarly = true;
-
     renderUI();
     calc();
 }
