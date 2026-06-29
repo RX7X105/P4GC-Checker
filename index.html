@@ -69,7 +69,7 @@ body{
 
     flex:0 0 auto;
 
-    width:7.4em;
+    width:8.5em;
     text-align:center;
     background:#444;
     color:#fff;
@@ -255,8 +255,10 @@ else if(id==="f2"){
         : '偽 <img src="偽.png" class="statusIcon">';
 }
         else{
-            btn.textContent = btn.dataset.label + (val ? "（真）" : "（偽）");
-        }
+    btn.innerHTML = val
+        ? `${btn.dataset.label}（真 <img src="真.png" class="statusIcon">）`
+        : `${btn.dataset.label}（偽 <img src="偽.png" class="statusIcon">）`;
+}
     });
 }
 
