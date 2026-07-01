@@ -16,16 +16,10 @@ body{
     font-family:sans-serif;
 }
 
-/* =========================
-   共通フォント基準
-========================= */
 :root{
     --base-font: clamp(16px, 2.1vh, 24px);
 }
 
-/* =========================
-   行レイアウト
-========================= */
 .gcRow{
     display:flex;
     align-items:center;
@@ -33,42 +27,31 @@ body{
     margin:6px 0;
 }
 
-/* ラベル列（固定幅） */
 .label{
-    width:7em;
+    flex:0 0 clamp(84px, 14vw, 120px);
+    width:clamp(84px, 14vw, 120px);
     font-size:var(--base-font);
     font-weight:bold;
     white-space:nowrap;
 }
 
-/* ボタン列 */
 .gcBtns{
     display:flex;
     gap:6px;
 }
 
-/* =========================
-   ボタン（完全統一）
-========================= */
 .gcBtns .btn{
     font-size:var(--base-font);
     line-height:1;
-
     height:3.0em;
-
     padding:0 9px;
-
     border:none;
     border-radius:6px;
-
     display:flex;
     align-items:center;
     justify-content:center;
-
     white-space:nowrap;
-
     flex:0 0 auto;
-
     width:10.0em;
     text-align:center;
     background:#444;
@@ -79,22 +62,15 @@ body{
     background:#1e8e3e;
 }
 
-/* =========================
-   メインボタン（既存維持）
-========================= */
 .btn{
     border:none;
     border-radius:8px;
-        font-size:var(--base-font);
+    font-size:var(--base-font);
     font-weight:bold;
     background:#333;
     color:#fff;
-    
 }
 
-/* =========================
-   結果
-========================= */
 .result{
     margin-top:6px;
     background:#000;
@@ -109,9 +85,6 @@ body{
 .stop{ color:#ffd600; font-weight:900; }
 .move{ color:#4fc3ff; font-weight:900; }
 
-/* =========================
-   下部ボタン
-========================= */
 .btnRow{
     display:flex;
     gap:6px;
@@ -139,15 +112,8 @@ body{
     font-size:var(--base-font);
 }
 
-.headshare{
-    color:#4fc3ff; /* 水色 */
-    font-weight:900;
-}
-
-.spread{
-    color:#ffd600; /* 黄色 */
-    font-weight:900;
-}
+.headshare{ color:#4fc3ff; font-weight:900; }
+.spread{ color:#ffd600; font-weight:900; }
 
 .statusIcon{
     height:1.35em;
@@ -167,7 +133,6 @@ body{
     <div class="gcBtns">
         <button class="btn" data-id="f1"></button>
         <button class="btn" data-id="t1"></button>
-        
     </div>
 </div>
 
@@ -181,7 +146,7 @@ body{
 
 <!-- ほのお・つなみ -->
 <div class="gcRow">
-    <div class="label">ほのお・つなみ</div>
+    <div class="label">炎・津波</div>
     <div class="gcBtns">
         <button class="btn" data-id="c5" data-label="ほのお"></button>
         <button class="btn" data-id="c6" data-label="つなみ"></button>
@@ -206,10 +171,8 @@ body{
     </div>
 </div>
 
-<!-- 結果 -->
 <div id="result" class="result"></div>
 
-<!-- 下部 -->
 <div class="btnRow">
     <button class="reset" onclick="resetAll()">リセット</button>
     <button id="viewBtn" onclick="toggleView()">表示：頭割り/散開</button>
@@ -231,13 +194,18 @@ const s = {
 
 let simpleView = true;
 
+// 差分キャッシュ（プルプル対策）
+const prev = {};
+
 function renderUI(){
 
     document.querySelectorAll(".btn").forEach(btn=>{
 
         const id = btn.dataset.id;
-
         let val = (id==="t1") ? s.firstThunderEarly : s[id];
+
+        if(prev[id] === val) return;
+        prev[id] = val;
 
         btn.classList.toggle("active", !!val);
 
@@ -245,20 +213,20 @@ function renderUI(){
             btn.textContent = "水雷（" + (s.firstThunderEarly ? "早" : "遅") + "）";
         }
         else if(id==="f1"){
-    btn.innerHTML = s.f1
-        ? '真 <img src="真.png" class="statusIcon">'
-        : '偽 <img src="偽.png" class="statusIcon">';
-}
-else if(id==="f2"){
-    btn.innerHTML = s.f2
-        ? '真 <img src="真.png" class="statusIcon">'
-        : '偽 <img src="偽.png" class="statusIcon">';
-}
+            btn.innerHTML = s.f1
+                ? '真 <img src="真.png" class="statusIcon">'
+                : '偽 <img src="偽.png" class="statusIcon">';
+        }
+        else if(id==="f2"){
+            btn.innerHTML = s.f2
+                ? '真 <img src="真.png" class="statusIcon">'
+                : '偽 <img src="偽.png" class="statusIcon">';
+        }
         else{
-    btn.innerHTML = val
-        ? `${btn.dataset.label}（真 <img src="真.png" class="statusIcon">）`
-        : `${btn.dataset.label}（偽 <img src="偽.png" class="statusIcon">）`;
-}
+            btn.innerHTML = val
+                ? `${btn.dataset.label || ""}（真 <img src="真.png" class="statusIcon">）`
+                : `${btn.dataset.label || ""}（偽 <img src="偽.png" class="statusIcon">）`;
+        }
     });
 }
 
@@ -268,11 +236,10 @@ function make(j){
             ? '水：<span class="headshare">頭割り</span>　雷：<span class="spread">散開</span>'
             : '水：<span class="spread">散開</span>　雷：<span class="headshare">頭割り</span>';
     }
+    return j ? '水：AC　雷：BD' : '水：BD　雷：AC';
+}
 
-    return j
-        ? '水：AC　雷：BD'
-        : '水：BD　雷：AC';
-}function calc(){
+function calc(){
 
     const f1 = s.f1;
     const f2 = s.f2;
@@ -293,8 +260,8 @@ function make(j){
     const k5 = s.c5 ? "中央から外へ" : "中央待機";
     const k6 = s.c6 ? "中央待機" : "中央から外へ";
 
-    const j8 = (s.c8 === s.d8) ? "踏まない" : "直線踏む";
-    const j9 = (s.c9 === s.d9) ? "踏まない" : "扇踏む";
+    const j8 = s.c8 ? "踏まない" : "直線踏む";
+    const j9 = s.c9 ? "踏まない" : "扇踏む";
 
     let l1;
     if(j8==="踏まない" && j9==="踏まない") l1="踏まない";
@@ -316,13 +283,9 @@ function make(j){
 <br>⑦ ${l1}`;
 }
 
-function toggleView(){
-    simpleView = !simpleView;
-    document.getElementById("viewBtn").textContent =
-        simpleView ? "表示：頭割り/散開" : "表示：AC/BD";
-    calc();
-}
-
+// =========================
+// クリック操作
+// =========================
 document.querySelectorAll(".btn").forEach(btn=>{
     btn.addEventListener("pointerdown",(e)=>{
         e.preventDefault();
@@ -335,6 +298,44 @@ document.querySelectorAll(".btn").forEach(btn=>{
         calc();
     });
 });
+
+// =========================
+// テンキー（安定版）
+// =========================
+window.addEventListener("keydown", (e) => {
+
+    if (["INPUT","TEXTAREA"].includes(document.activeElement.tagName)) return;
+    if (e.repeat) return;
+
+    switch (e.code) {
+
+        case "Numpad7": s.f1 = !s.f1; break;
+        case "Numpad4": s.firstThunderEarly = !s.firstThunderEarly; break;
+        case "Numpad1": s.f2 = !s.f2; break;
+
+        case "Numpad8": s.c5 = !s.c5; break;
+        case "Numpad9": s.c6 = !s.c6; break;
+
+        case "Numpad5": s.c8 = !s.c8; break;
+        case "Numpad6": s.d8 = !s.d8; break;
+
+        case "Numpad2": s.c9 = !s.c9; break;
+        case "Numpad3": s.d9 = !s.d9; break;
+
+        default: return;
+    }
+
+    e.preventDefault();
+    renderUI();
+    calc();
+});
+
+function toggleView(){
+    simpleView = !simpleView;
+    document.getElementById("viewBtn").textContent =
+        simpleView ? "表示：頭割り/散開" : "表示：AC/BD";
+    calc();
+}
 
 function resetAll(){
     Object.keys(s).forEach(k=>{
